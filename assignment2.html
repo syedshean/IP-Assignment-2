@@ -1,0 +1,197 @@
+<html>
+
+<head>
+<title>Assignment 2</title>
+<link rel="stylesheet" href="jquerytreeview.css">
+
+<script src="jquery.js" type="text/javascript"></script>
+<script src="jquerycookie.js" type="text/javascript"></script>
+<script src="jquerytreeview.js" type="text/javascript"></script>
+
+
+
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="design.css">			
+<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css">
+
+</head>
+<body>
+<div id="wrapper" align="center">
+		<div id="header">
+			<div class="container1" id="container1" >
+				<div class="jumbotron1" id="jumbotron1">
+					<h1 align="center" style="margin-bottom: 50px;" id="jumbotron2" >An Clickable Product Category (Tree)</h1>
+					
+				</div>
+				
+			</div>
+		</div>
+		<div id="content">
+			<p id="body">
+
+<script>
+$(document).ready(function(){
+	$("#browser").treeview();	
+	
+});
+</script>
+<script>
+	function ajaxCatInfo(catDescription){
+		
+		alert(xmlcatDescription[catDescription].childNodes[0].nodeValue);
+	}
+	function jqueryCatInfo(catDescription){
+		
+		return xmlcatDescription[catDescription].childNodes[0].nodeValue;
+	}
+	
+	function ajaxProdInfo(prodDescription){
+		
+		alert("Product Name: "+xmlProducts[prodDescription].childNodes[0].nodeValue
+		+"\nPrice: "+xmlprodPrice[prodDescription].childNodes[0].nodeValue
+		+ "\nDescription(QuantityPerUnit): " + xmlprodQuantity[prodDescription].childNodes[0].nodeValue);
+	}
+	function jqueryProdInfo(prodDescription){
+		
+		return "<b>Price:</b> "+xmlprodPrice[prodDescription].childNodes[0].nodeValue
+		+ "\n<br><b>Description(QuantityPerUnit):</b> " + xmlprodQuantity[prodDescription].childNodes[0].nodeValue;
+	}
+</script>
+
+<script type="text/javascript">
+var xhttp,xmlCategoriesDoc,xmlProductsDoc;
+xhttp = new XMLHttpRequest();
+
+xhttp.open("GET", "categories.xml", false);
+xhttp.send();
+xmlCategoriesDoc = xhttp.responseXML;
+
+xhttp.open("GET", "products.xml", false);
+xhttp.send();
+xmlProductsDoc = xhttp.responseXML;
+
+
+    var xmlCategories,xmlProducts, i,j;    
+   
+    xmlCategories = xmlCategoriesDoc.getElementsByTagName("CategoryName");
+	xmlProducts = xmlProductsDoc.getElementsByTagName("ProductName");
+	xmlCategoryID = xmlCategoriesDoc.getElementsByTagName("CategoryID");
+	xmlProCategoryID = xmlProductsDoc.getElementsByTagName("CategoryID");
+	xmlcatDescription = xmlCategoriesDoc.getElementsByTagName("Description");
+	xmlprodQuantity = xmlProductsDoc.getElementsByTagName("QuantityPerUnit");
+	xmlprodPrice = xmlProductsDoc.getElementsByTagName("UnitPrice");
+	
+	
+	
+	$(document).ready(function() {
+	var folders = $('#browser > li > #browser > li');
+	$.each(folders, function (i, folder) {
+		$(folder).click(function () {
+			var $dialog = $('#dialogDiv');
+			$dialog.text(jqueryCatInfo(i));
+			$dialog.dialog({
+				modal: true,
+               buttons: {
+                  OK: function() {$(this).dialog("close");}
+               },
+			
+			});
+			var title = $(folder).find('.folder').text();
+			$('#ui-dialog-title-dialogDiv').text(title);
+			$dialog.show();
+			$dialog.dialog('open');
+		});
+	});
+	
+	var files = $('#browser > li > #browser > li > ul > li');
+	$.each(files, function (i, file) {
+		$(file).click(function () {
+			var $dialog = $('#dialogDiv');
+			$dialog.html(jqueryProdInfo(i));
+			$dialog.dialog({
+				modal: true,
+				buttons: {
+                  OK: function() {$(this).dialog("close");}
+				},
+			});
+			var title = $(file).find('.file').text();
+			$('#ui-dialog-title-dialogDiv').text(title);
+			$dialog.show();
+			$dialog.dialog('open');
+			return false;
+		});
+	});
+});
+	
+</script>
+<table align="center" >
+<tr>
+<td style='padding-right:150px;'>
+<script  type="text/javascript">
+	
+	document.write("<h2>Ajax View</h2>");
+	document.write("<span>Product List</span>")
+	document.write("<ol type='i'>");
+    for (i = 0; i < xmlCategories.length; i++) { 
+		document.write("<li><span  onmouseover='' style='cursor: pointer;' onclick='ajaxCatInfo("+i+")'>");
+        document.write(xmlCategories[i].childNodes[0].nodeValue + "</span>");
+		document.write("<ol type='a'>");
+		for(j=0; j< xmlProducts.length; j++){
+			if(xmlCategoryID[i].childNodes[0].nodeValue==xmlProCategoryID[j].childNodes[0].nodeValue){
+				document.write("<li onclick='ajaxProdInfo("+j+")'><span  onmouseover='' style='cursor: pointer;'>");
+				document.write(xmlProducts[j].childNodes[0].nodeValue + "</span>");
+				document.write("</li>");
+			}
+		}
+		document.write("</ol>");
+		document.write("</li>");
+    }
+    
+	document.write("</ol>");
+
+</script>
+</td>
+<td>
+<script>
+	document.write("<h2>JQuery View</h2>");
+	document.write("<ul id='browser' class='filetree'>");
+	document.write("<li><span class='folder'>Product List</span>");
+	document.write("<ul id='browser' class='filetree' style='background-color: #f6f6ee;'>");
+	document.write("<div id='dialogDiv' style='display:none'></div>");
+    for (i = 0; i < xmlCategories.length; i++) { 
+		document.write("<li ><span class='folder'><span>" + xmlCategories[i].childNodes[0].nodeValue + "</span></span>");
+		
+		document.write("<ul style='background-color: #f6f6ee;'>");
+		for(j=0; j< xmlProducts.length; j++){
+			if(xmlCategoryID[i].childNodes[0].nodeValue==xmlProCategoryID[j].childNodes[0].nodeValue){
+				document.write("<li><span class='file' ><span onmouseover='' style='cursor: pointer;'>"+ xmlProducts[j].childNodes[0].nodeValue +"</span></span></li>");
+			}
+		}
+		document.write("</ul>");
+		document.write("</li>");
+    }
+    
+	document.write("</ul>");
+	document.write("</li>");
+	document.write("</ul>");
+
+
+</script>
+</td>
+<!--Help taken from http://www.w3schools.com/xml/dom_httprequest.asp,
+http://www.w3schools.com/xml/dom_nodes_access.asp,
+ http://www.java2s.com/Open-Source/Javascript_Free_Code/jQuery_Plugin/Download_jquery_treeview_Free_Java_Code.htm -->
+ </tr>
+</table>
+	</p>
+		</div>
+		<div class="container1" id="footer">
+			<div class="panel panel-default" id="panel_panel-default1" style="background-color:#eee;">
+				<div class="panel-body1" align="center" style="background-color:#eee;" id="panel-body">&copy; Syed Shean(99155487)</div>
+			</div>
+		</div>
+	</div>
+ </body>
+</html>
